@@ -2,6 +2,22 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { KeyMappingConfig, HandMapping } from '../features/keyboard-avatar/types';
 
+export interface SpriteSet {
+  body: string;
+  leftArmUp: string;
+  leftArmDown: string;
+  rightArmUp: string;
+  rightArmDown: string;
+}
+
+export const DEFAULT_SPRITES: SpriteSet = {
+  body:         '/sprites/default/body.png',
+  leftArmUp:    '/sprites/default/left-up.png',
+  leftArmDown:  '/sprites/default/left-down.png',
+  rightArmUp:   '/sprites/default/right-up.png',
+  rightArmDown: '/sprites/default/right-down.png',
+};
+
 // QWERTY 기본 키-손 매핑
 const DEFAULT_MAPPINGS: Record<string, HandMapping> = {
   // 왼손 영역
@@ -59,6 +75,8 @@ export const DEFAULT_CONFIG: KeyMappingConfig = {
   mappings: DEFAULT_MAPPINGS,
   idleTimeoutMs: 150,
   interpolationDurationMs: 80,
+  modelPath: '/models/default/default.model3.json',
+  sprites: DEFAULT_SPRITES,
 };
 
 interface ConfigStoreState {
@@ -67,6 +85,8 @@ interface ConfigStoreState {
   updateMapping: (keyCode: string, mapping: HandMapping) => void;
   resetMappings: () => void;
   setLoadError: (error: string | null) => void;
+  updateSprite: (slot: keyof SpriteSet, value: string) => void;
+  resetSprites: () => void;
 }
 
 export const useConfigStore = create<ConfigStoreState>()(
@@ -86,6 +106,17 @@ export const useConfigStore = create<ConfigStoreState>()(
           config: { ...state.config, mappings: DEFAULT_MAPPINGS },
         })),
       setLoadError: (error) => set({ loadError: error }),
+      updateSprite: (slot, value) =>
+        set((state) => ({
+          config: {
+            ...state.config,
+            sprites: { ...state.config.sprites, [slot]: value },
+          },
+        })),
+      resetSprites: () =>
+        set((state) => ({
+          config: { ...state.config, sprites: DEFAULT_SPRITES },
+        })),
     }),
     { name: 'avatar-key-mapping' }
   )

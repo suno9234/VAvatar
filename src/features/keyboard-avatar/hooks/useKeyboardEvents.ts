@@ -10,18 +10,19 @@ export function useKeyboardEvents(onKeyEvent: KeyEventHandler) {
     let unlisten: (() => void) | null = null;
 
     const setup = async () => {
-      // Rust 백엔드에 프론트엔드 준비 완료 신호 전송
       try {
         await invoke('frontend_ready');
-      } catch {
-        // frontend_ready 커맨드가 없으면 무시 (Task 5 구현 전)
+        console.log('[useKeyboardEvents] frontend_ready 전송 완료');
+      } catch (e) {
+        console.warn('[useKeyboardEvents] frontend_ready 실패:', e);
       }
 
-      // keyboard-event 채널 구독
       const unlistenFn = await listen<KeyEventPayload>('keyboard-event', (event) => {
+        console.log('[useKeyboardEvents] 이벤트 수신:', event.payload);
         onKeyEvent(event.payload);
       });
 
+      console.log('[useKeyboardEvents] keyboard-event 구독 완료');
       unlisten = unlistenFn;
     };
 

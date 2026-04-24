@@ -6,6 +6,7 @@ use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NormalizedKeyEvent {
     pub key_code: String,
     pub event_type: String, // "keydown" | "keyup"

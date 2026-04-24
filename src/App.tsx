@@ -1,50 +1,53 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { KeyboardAvatarOverlay } from './features/keyboard-avatar/KeyboardAvatarOverlay';
+import { SettingsManager } from './features/keyboard-avatar/components/SettingsManager';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+function getWindowLabel(): string | null {
+  try {
+    // Tauri 환경에서만 존재하는 내부 메타데이터로 창 레이블 확인
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (window as any).__TAURI_INTERNALS__?.metadata?.currentWindow?.label ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function isOverlayView(): boolean {
+  const label = getWindowLabel();
+  if (label !== null) return label === 'overlay';
+  // OBS 브라우저 소스: URL 해시로 판단
+  return window.location.hash === '#/overlay';
+}
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+  if (isOverlayView()) {
+    return (
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden', background: 'transparent' }}>
+        <ErrorBoundary fallback={
+          <div style={{ color: '#f44336', padding: 16, fontFamily: 'monospace', fontSize: 12 }}>
+            오버레이 초기화 실패
+          </div>
+        }>
+          <KeyboardAvatarOverlay />
+        </ErrorBoundary>
+      </div>
+    );
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <div style={{ minHeight: '100vh', backgroundColor: '#121212' }}>
+      <nav style={{
+        display: 'flex', alignItems: 'center',
+        padding: '10px 20px', backgroundColor: '#1a1a1a',
+        borderBottom: '1px solid #2a2a2a',
+      }}>
+        <span style={{ color: '#fff', fontWeight: 700, fontSize: 16 }}>Avatar 설정</span>
+        <span style={{ marginLeft: 'auto', color: '#666', fontSize: 12 }}>
+          OBS 브라우저 소스: http://localhost:1420/#/overlay
+        </span>
+      </nav>
+      <SettingsManager />
+    </div>
   );
 }
 

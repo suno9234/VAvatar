@@ -31,4 +31,6 @@ export interface KeyMappingConfig {
   mappings: Record<string, HandMapping>; // keyCode → HandMapping
   idleTimeoutMs: number;           // 기본: 150
   interpolationDurationMs: number; // 기본: 80
+  modelPath: string;               // Live2D .model3.json 경로
+  sprites: import('../../store/configStore').SpriteSet;
 }
