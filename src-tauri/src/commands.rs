@@ -1,4 +1,4 @@
-use crate::config::{AppConfig, ConfigReader};
+use crate::config::{AppConfig, CatLayout, ConfigReader, KeyboardLayout};
 use tauri::State;
 use crate::AppState;
 
@@ -35,6 +35,20 @@ pub fn set_hook_enabled(enabled: bool, state: State<AppState>) -> Result<(), Str
 #[tauri::command]
 pub fn set_sensitive_mode(sensitive: bool, state: State<AppState>) {
     state.filter.set_sensitive_mode(sensitive);
+}
+
+#[tauri::command]
+pub fn get_layout(state: State<AppState>) -> (CatLayout, KeyboardLayout) {
+    let config = state.config.lock().unwrap();
+    (config.cat_layout.clone(), config.keyboard_layout.clone())
+}
+
+#[tauri::command]
+pub fn save_layout(cat: CatLayout, keyboard: KeyboardLayout, state: State<AppState>) -> Result<(), String> {
+    let mut config = state.config.lock().unwrap();
+    config.cat_layout = cat;
+    config.keyboard_layout = keyboard;
+    ConfigReader::save(&config)
 }
 
 /// 오버레이 창 + WebView2 자식 창 전체에 WS_EX_NOACTIVATE 적용

@@ -8,7 +8,21 @@ export interface SpriteSet {
   leftArmDown: string;
   rightArmUp: string;
   rightArmDown: string;
+  mouse: string;
 }
+
+export interface KeyboardDisplayLayout {
+  x: number;
+  y: number;
+  rotation: number;
+}
+
+export interface CatLayout {
+  x: number; // translate X — 스프라이트 자체 너비 대비 비율
+  y: number; // translate Y — 스프라이트 자체 높이 대비 비율
+}
+
+export const DEFAULT_CAT_LAYOUT: CatLayout = { x: 0, y: 0 };
 
 export const DEFAULT_SPRITES: SpriteSet = {
   body:         '/sprites/default/body.png',
@@ -16,6 +30,14 @@ export const DEFAULT_SPRITES: SpriteSet = {
   leftArmDown:  '/sprites/default/left-down.png',
   rightArmUp:   '/sprites/default/right-up.png',
   rightArmDown: '/sprites/default/right-down.png',
+  mouse:        '/sprites/default/mouse.png',
+};
+
+// x, y는 외부 컨테이너 크기 대비 비율 (0~1)
+export const DEFAULT_KEYBOARD_LAYOUT: KeyboardDisplayLayout = {
+  x: 0.25,
+  y: 0.58,
+  rotation: 0,
 };
 
 // QWERTY 기본 키-손 매핑
@@ -81,18 +103,26 @@ export const DEFAULT_CONFIG: KeyMappingConfig = {
 
 interface ConfigStoreState {
   config: KeyMappingConfig;
+  keyboardLayout: KeyboardDisplayLayout;
+  catLayout: CatLayout;
   loadError: string | null;
   updateMapping: (keyCode: string, mapping: HandMapping) => void;
   resetMappings: () => void;
   setLoadError: (error: string | null) => void;
   updateSprite: (slot: keyof SpriteSet, value: string) => void;
   resetSprites: () => void;
+  updateKeyboardLayout: (layout: KeyboardDisplayLayout) => void;
+  resetKeyboardLayout: () => void;
+  updateCatLayout: (layout: CatLayout) => void;
+  resetCatLayout: () => void;
 }
 
 export const useConfigStore = create<ConfigStoreState>()(
   persist(
     (set) => ({
       config: DEFAULT_CONFIG,
+      keyboardLayout: DEFAULT_KEYBOARD_LAYOUT,
+      catLayout: DEFAULT_CAT_LAYOUT,
       loadError: null,
       updateMapping: (keyCode, mapping) =>
         set((state) => ({
@@ -117,7 +147,30 @@ export const useConfigStore = create<ConfigStoreState>()(
         set((state) => ({
           config: { ...state.config, sprites: DEFAULT_SPRITES },
         })),
+      updateKeyboardLayout: (layout) => set({ keyboardLayout: layout }),
+      resetKeyboardLayout: () => set({ keyboardLayout: DEFAULT_KEYBOARD_LAYOUT }),
+      updateCatLayout: (layout) => set({ catLayout: layout }),
+      resetCatLayout: () => set({ catLayout: DEFAULT_CAT_LAYOUT }),
     }),
-    { name: 'avatar-key-mapping' }
+    {
+      name: 'avatar-key-mapping',
+      version: 4,
+      migrate: (state: unknown, version: number) => {
+        let s = state as Record<string, unknown>;
+        if (version < 1) s = { ...s, keyboardLayout: DEFAULT_KEYBOARD_LAYOUT };
+        if (version < 2) s = { ...s, catLayout: DEFAULT_CAT_LAYOUT };
+        if (version < 3) s = { ...s, keyboardLayout: DEFAULT_KEYBOARD_LAYOUT, catLayout: DEFAULT_CAT_LAYOUT };
+        if (version < 4) {
+          const config = s.config as Record<string, unknown> | undefined;
+          if (config && typeof config === 'object') {
+            const sprites = config.sprites as Record<string, unknown> | undefined;
+            if (sprites && !sprites.mouse) {
+              s = { ...s, config: { ...config, sprites: { ...sprites, mouse: DEFAULT_SPRITES.mouse } } };
+            }
+          }
+        }
+        return s;
+      },
+    }
   )
 );

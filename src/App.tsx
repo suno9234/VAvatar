@@ -19,20 +19,22 @@ function isOverlayView(): boolean {
   return window.location.hash === '#/overlay';
 }
 
+function OverlayApp() {
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', background: 'transparent' }}>
+      <ErrorBoundary fallback={
+        <div style={{ color: '#f44336', padding: 16, fontFamily: 'monospace', fontSize: 12 }}>
+          오버레이 초기화 실패
+        </div>
+      }>
+        <KeyboardAvatarOverlay />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
 function App() {
-  if (isOverlayView()) {
-    return (
-      <div style={{ width: '100%', height: '100%', overflow: 'hidden', background: 'transparent' }}>
-        <ErrorBoundary fallback={
-          <div style={{ color: '#f44336', padding: 16, fontFamily: 'monospace', fontSize: 12 }}>
-            오버레이 초기화 실패
-          </div>
-        }>
-          <KeyboardAvatarOverlay />
-        </ErrorBoundary>
-      </div>
-    );
-  }
+  if (isOverlayView()) return <OverlayApp />;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#121212' }}>

@@ -3,12 +3,42 @@ use std::fs;
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CatLayout {
+    pub x: f64,
+    pub y: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct KeyboardLayout {
+    pub x: f64,
+    pub y: f64,
+    pub rotation: f64,
+}
+
+fn default_cat_layout() -> CatLayout { CatLayout { x: 0.0, y: 0.0 } }
+fn default_keyboard_layout() -> KeyboardLayout { KeyboardLayout { x: 0.25, y: 0.58, rotation: 0.0 } }
+fn default_overlay_width() -> u32 { 400 }
+fn default_overlay_height() -> u32 { 400 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub hook_enabled: bool,
     pub animation_intensity: f32,
     pub model_path: String,
     pub idle_timeout_ms: u64,
     pub interpolation_duration_ms: u64,
+    #[serde(default = "default_cat_layout")]
+    pub cat_layout: CatLayout,
+    #[serde(default = "default_keyboard_layout")]
+    pub keyboard_layout: KeyboardLayout,
+    #[serde(default)]
+    pub overlay_x: Option<i32>,
+    #[serde(default)]
+    pub overlay_y: Option<i32>,
+    #[serde(default = "default_overlay_width")]
+    pub overlay_width: u32,
+    #[serde(default = "default_overlay_height")]
+    pub overlay_height: u32,
 }
 
 impl Default for AppConfig {
@@ -19,6 +49,12 @@ impl Default for AppConfig {
             model_path: "models/avatar.model3.json".to_string(),
             idle_timeout_ms: 150,
             interpolation_duration_ms: 80,
+            cat_layout: default_cat_layout(),
+            keyboard_layout: default_keyboard_layout(),
+            overlay_x: None,
+            overlay_y: None,
+            overlay_width: default_overlay_width(),
+            overlay_height: default_overlay_height(),
         }
     }
 }
