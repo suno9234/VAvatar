@@ -13,12 +13,6 @@ OBS, XSplit 등 방송 소프트웨어의 **창 캡처**로 바로 사용할 수
 
 > 왼손 키 → 왼팔 내림 / 오른손 키 → 오른팔 내림 / 마우스 이동 → 마우스 모드 팔로 교체
 
-### 키보드 디스플레이
-
-| 기본 키보드 | 키 미입력 | 키 입력 |
-|:-----------:|:---------:|:-------:|
-| ![kb-base](public/sprites/default/keyboard_base.png) | ![q-up](public/sprites/default/keboard_q_unclick.png) | ![q-down](public/sprites/default/keboard_q_click.png) |
-
 ---
 
 ## 설치 방법
