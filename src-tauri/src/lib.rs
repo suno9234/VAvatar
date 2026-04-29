@@ -293,14 +293,9 @@ pub fn run() {
                         .unwrap_or(620.0 / 280.0);
                     aspect_lock::attach(hwnd.0, initial_aspect);
 
-                    // 프레임을 클라이언트 영역 전체로 확장 — WebView2 inset 제거
-                    use windows_sys::Win32::Graphics::Dwm::{DwmExtendFrameIntoClientArea, DwmSetWindowAttribute, DWMWA_WINDOW_CORNER_PREFERENCE};
-                    use windows_sys::Win32::UI::Controls::MARGINS;
+                    // Windows 11 둥근 모서리 비활성화
+                    use windows_sys::Win32::Graphics::Dwm::{DwmSetWindowAttribute, DWMWA_WINDOW_CORNER_PREFERENCE};
                     unsafe {
-                        let margins = MARGINS { cxLeftWidth: -1, cxRightWidth: -1, cyTopHeight: -1, cyBottomHeight: -1 };
-                        DwmExtendFrameIntoClientArea(hwnd.0, &margins);
-
-                        // Windows 11 둥근 모서리 비활성화
                         let preference: u32 = 1; // DWMWCP_DONOTROUND
                         DwmSetWindowAttribute(
                             hwnd.0,
