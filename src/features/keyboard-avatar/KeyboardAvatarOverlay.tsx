@@ -36,15 +36,17 @@ export function KeyboardAvatarOverlay() {
   const armOffset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const MAX = 14;
+    const MAX_RIGHT = 14;
+    const MAX_LEFT = 3;
+    const MAX_DOWN = 6;
     const SCALE = 0.18;
     const DECAY = 0.82;
 
     const unlistenDelta = listen<[number, number]>('mouse-delta', (e) => {
       const [dx, dy] = e.payload;
       armOffset.current = {
-        x: Math.max(-MAX, Math.min(MAX, armOffset.current.x + dx * SCALE)),
-        y: Math.max(-MAX, Math.min(MAX, armOffset.current.y + dy * SCALE)),
+        x: Math.max(-MAX_LEFT, Math.min(MAX_RIGHT, armOffset.current.x + dx * SCALE)),
+        y: Math.max(-MAX_RIGHT, Math.min(MAX_DOWN, armOffset.current.y + dy * SCALE)),
       };
       setMouseMoving(true);
     });
@@ -291,7 +293,7 @@ export function KeyboardAvatarOverlay() {
           ref={rightArmRef}
           src={rightPressed ? sprites.rightArmDown : mouseMoving ? sprites.mouse : sprites.rightArmUp}
           alt=""
-          style={{ ...absFullStyle, zIndex: 3, left: mouseMoving && !rightPressed ? `${-30 * scale}px` : 0 }}
+          style={{ ...absFullStyle, zIndex: 3, left: mouseMoving && !rightPressed ? `${-50 * scale}px` : 0 }}
           draggable={false}
         />
       </div>
